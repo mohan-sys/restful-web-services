@@ -1,6 +1,9 @@
 package com.in28minutes.rest.webservices.restful_web_services.versioning;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Name {
+
     private String firstName;
 
     public Name(String firstName, String lastName) {
