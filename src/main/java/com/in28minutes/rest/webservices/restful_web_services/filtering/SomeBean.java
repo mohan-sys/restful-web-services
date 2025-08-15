@@ -1,22 +1,24 @@
 package com.in28minutes.rest.webservices.restful_web_services.filtering;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 // @JsonIgnoreProperties({"value1","value2"})
+@JsonFilter("SomeBeanFilter")
 public class SomeBean {
 
     private String value1;
-    @JsonIgnore
+    // @JsonIgnore
     private String value2;
     private String value3;
 
     @Override
     public String toString() {
         return "SomeBean{" +
-                "value1='" + value1 + '\'' +
-                ", value2='" + value2 + '\'' +
-                ", value3='" + value3 + '\'' +
+                "field1='" + value1 + '\'' +
+                ", field2='" + value2 + '\'' +
+                ", field3='" + value3 + '\'' +
                 '}';
     }
 
