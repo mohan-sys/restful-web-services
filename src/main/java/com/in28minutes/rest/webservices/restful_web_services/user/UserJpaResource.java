@@ -1,5 +1,6 @@
 package com.in28minutes.rest.webservices.restful_web_services.user;
 
+import com.in28minutes.rest.webservices.restful_web_services.jpa.PostRepository;
 import com.in28minutes.rest.webservices.restful_web_services.jpa.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.EntityModel;
@@ -19,9 +20,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UserJpaResource {
 
     private UserRepository repository;
+    private PostRepository postRepository;
 
-    public UserJpaResource( UserRepository repository) {
+    public UserJpaResource( UserRepository repository, PostRepository postRepository) {
         this.repository = repository;
+        this.postRepository = postRepository;
 
     }
     // GET/users
@@ -32,8 +35,7 @@ public class UserJpaResource {
 
 
 
-    // link -> Entity model ,
-    // GET/user
+
     @GetMapping("/jpa/users/{id}")
     public EntityModel<User> retreiveUser(@PathVariable int id){
         Optional<User> user = repository.findById(id);
@@ -49,11 +51,15 @@ public class UserJpaResource {
         return entityModel;
     }
 
+
+
     // DELETE/user
     @DeleteMapping("/jpa/users/{id}")
     public void deleteUser(@PathVariable int id){
        repository.deleteById(id);
     }
+
+
 
     @GetMapping("/jpa/users/{id}/posts")
     public List<Post> retrievePostsForUser(@PathVariable int id){
@@ -64,6 +70,29 @@ public class UserJpaResource {
         }
 
         return user.get().getPosts();
+    }
+
+    @PostMapping("/jpa/users/{id}/posts")
+    public ResponseEntity<Object> createPostForUser(@PathVariable int id, @Valid @RequestBody Post post){
+        Optional<User> user = repository.findById(id);
+
+        if(user.isEmpty()){
+            throw new UserNotFoundException("id: "+ id);
+        }
+
+        post.setUser(user.get());
+        Post savedPost = postRepository.save(post);
+
+        // to get the uri of the user being appended into the json -> can view in location (POSTMAN)
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedPost.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
+
+
     }
 
     // POST/users
